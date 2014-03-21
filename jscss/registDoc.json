@@ -1,0 +1,16 @@
+{
+  "code": "登记表编号",
+  "submitDept": "填报单位",
+  "submitDate": "填报时间",
+   "orgnization": "单位名称",   
+  "archiveOfficer": "综合档案室负责人",
+  "archiveLeader": "分管领导",  
+  "telphone": "联系电话",
+  "address": "地址",
+  "postcode": "邮编",
+  "eFileTotal": "归档电子文件总量(GB)",
+  "eFileNumber": "归档电子文件数量（件）",
+  "software": "软件环境（型号、版本等）",
+  "systemInterface": "是否有系统接口",
+  "backupTypeNow": "现备份方式"
+}

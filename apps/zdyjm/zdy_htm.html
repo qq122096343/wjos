@@ -1,0 +1,34 @@
+﻿<script>
+$(function(){
+	$("#word_html_textarea").change(function(){
+		$("#word_html").html($("#word_html_textarea").val());
+	});
+	$("#过滤标签").click(function(){
+		$("td ,table ,span ,p ,tr",$("#word_html")).removeAttr("style class align lang valign width height");
+		$("#word_html_textarea").val($("#word_html").html());
+	});
+});
+</script>
+<style>
+#word_html_textarea, #word_html {
+	position: absolute;top: 0;
+	height: 100%; width: 50%;
+	padding: 0; margin: 0;
+}
+#word_html td {
+	border: 1px solid #000;
+}
+#word_html table {
+	border-collapse: collapse;
+	width: 100%;
+}
+</style>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'center'" style="overflow:hidden;">
+        <textarea id="word_html_textarea" style="left:0;"></textarea>
+        <div id="word_html" style="right:0; overflow:auto;"></div>
+    </div>
+    <div data-options="region:'south'" style="overflow:hidden;" >
+		<button id="过滤标签">过滤标签</button>
+    </div>
+</div>

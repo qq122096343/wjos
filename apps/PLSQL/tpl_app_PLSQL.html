@@ -1,0 +1,88 @@
+﻿<style>
+#write_sql {width:100%; border-collapse:collapse;height:100%;}
+#write_sql td { border:1px solid #ccc; }
+#write_sql span { border:1px dashed #F09; padding:0 4px;}
+</style> 
+
+<div class="easyui-layout" data-options="fit:true">
+  <div data-options="region:'north'" style="height:120px;">
+    <table id="write_sql">
+      <tr>
+        <td> 自定义sql </td>
+        <td class="自定义sql"> <span class="tablename" contentEditable="true">  </span></td>
+        <td><button id="bb" onclick="sql_noback($('.自定义sql').text());"> 提交 </button></td>
+      </tr>
+      <tr id="创建表">
+        <td> 创建表 </td>
+        <td> create table if not exists <span class="tablename" contentEditable="true"> a1 </span> ( <span class="tablefield" contentEditable="true"> a2 </span> ) </td>
+        <td><button> 提交 </button></td>
+      </tr>
+      <tr id="删除表">
+        <td> 删除表 </td>
+        <td> DROP TABLE <span class="tablename" contentEditable="true"> tablename </span></td>
+        <td><button> 提交 </button></td>
+      </tr>
+      <tr id="其他">
+        <td > 其他 </td>
+        <td colspan="2">
+        	<button class="sql_seq">sql_seq</button>
+            <button class="sql_tablename">sql_tablename </button>
+            <button class="sql_tablefield"> sql_tablefield</button>
+            <button class="sql_mycomputer"> sql_mycomputer</button>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+  <div data-options="region:'west'" class="sql_west" style="width:100px;"> </div>
+  <div data-options="region:'east'" class="sql_east" style="width:100px;"> </div>
+  <div data-options="region:'center'">
+    <table id="grid" fit="true">
+    </table>
+    <script>
+          $("#创建表 button").click(plsql["fn"]["创建表"]);
+          $("#删除表 button").click(plsql["fn"]["删除表"]);
+		  
+		  $("#其他 .sql_seq").click(function(){
+			  sql_noback(' INSERT INTO seq ("id","seq") VALUES ("seq", 10000) ');
+		  });
+		  $("#其他 .sql_tablename").click(function(){
+			  sql_noback(' INSERT INTO tablename ("id","tablename") VALUES ("1", "seq") ');
+			  sql_noback(' INSERT INTO tablename ("id","tablename") VALUES ("2", "tablename") ');
+			  sql_noback(' INSERT INTO tablename ("id","tablename") VALUES ("3", "tablefield") ');
+		  });
+		  $("#其他 .sql_tablefield").click(function(){
+			  sql_noback(' INSERT INTO tablefield ("id","tablename","tablefield") VALUES ("1", "seq","id") ');
+			  sql_noback(' INSERT INTO tablefield ("id","tablename","tablefield") VALUES ("1", "seq","seq") ');
+			  sql_noback(' INSERT INTO tablefield ("id","tablename","tablefield") VALUES ("1", "tablename","id") ');
+			  sql_noback(' INSERT INTO tablefield ("id","tablename","tablefield") VALUES ("1", "tablename","tablename") ');
+			  sql_noback(' INSERT INTO tablefield ("id","tablename","tablefield") VALUES ("1", "tablefield","id") ');
+			  sql_noback(' INSERT INTO tablefield ("id","tablename","tablefield") VALUES ("1", "tablefield","tablename") ');
+			  sql_noback(' INSERT INTO tablefield ("id","tablename","tablefield") VALUES ("1", "tablefield","tablefield") ');
+		  });
+		  $("#其他 .sql_mycomputer").click(function(){
+			  $("#创建表 .tablename").html("tree");
+			  $("#创建表 .tablefield").html("pid,name,type,iconSkin,lujing");
+			  $("#创建表 button").click();
+			  sql_noback('INSERT INTO tree (id,pid,name,type,iconSkin,lujing) VALUES (' + 10000 
+			  + ',"' + 0 + '", "新建文件夹","folder","folder","' + 10000 +'")');
+  
+		  });
+		  
+		  
+		  
+          $(".sql_west").click(plsql["fn"]["查询表"]);
+          $(document).on("click", ".查询表结构", plsql["fn"]["查询表结构"]);
+          $(document).on("click", ".查询表结构", function() {
+            var tablename = $(this).text();
+            plsql["fn"]["生成数据表格"](tablename);
+          });
+     </script> 
+  </div>
+  <div data-options="region:'south'" style="height:100px;"> <div id=res> </div> </div>
+</div>
+<div class="sql_btns">
+  <button sql="ALTER TABLE 表名 ADD 列名 datatype"> 新增列 </button>
+  <button sql="UPDATE 表名称 SET 列名称 = 新值 WHERE 列名称 = 某值"> 更新记录 </button>
+</div>
+ 

@@ -1,0 +1,32 @@
+<script>
+$(function() {
+    usejs(os.cssjs.database, function() {
+        os.sql.init(); 
+    });
+
+/*    usejs(os.cssjs.database, function() {
+        os.sql.init();os.sql.dtb.new_dtb('SYS_MB')
+    });*/
+});
+</script>
+
+<div class="easyui-layout" data-options="fit:true">
+  <div data-options="region:'north'" style="height:60px;">
+    <input style="width:98%;" id="自定义sql" />
+    <button onclick="os.sql['自定义sql']()"> 提交自定义sql </button>
+ 
+  </div>
+  <div data-options="region:'west'" class="sql_west" style="width:200px;">
+    <table id="west_grid" fit="true">
+    </table>
+  </div>
+  <!--<div data-options="region:'east'" class="sql_east" style="width:100px;"> </div>-->
+  <div data-options="region:'center'" class="sql_center">
+    <table id="center_grid" fit="true">
+    </table>
+  </div>
+  <!--<div data-options="region:'south'" style="height:100px;">
+    <div id=res>
+    </div>
+    </div>--> 
+</div>

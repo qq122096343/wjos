@@ -1,0 +1,49 @@
+﻿
+<div class="easyui-layout" data-options="fit:true">
+  <div data-options="region:'north'" style="height:40px;">
+		<button onClick="$('#tt').datagrid('loadData', rows);">本地加载</button>
+		<button onClick="$('#tt').datagrid({url:'http://www.jeasyui.com/demo/main/datagrid27_getdata.php'});">服务器加载</button>
+  </div>
+ 
+  <div data-options="region:'center'">
+     <table id="tt" data-options="fit:true" >
+        <thead>
+            <tr>
+                <th field="inv" width="80">Inv No</th>
+                <th field="name" width="80">Name</th>
+                <th field="note" width="110">Note</th>
+            </tr>
+        </thead>
+    </table>
+  </div>
+</div>
+
+ 
+
+    <script type="text/javascript">
+		var rows = [];
+		for(var i=1; i<=8000; i++){
+			rows.push({
+				inv: 'Inv No '+i,
+				name: 'Name '+i,
+				note: 'Note '+i
+			});
+		}
+ 
+        $(function(){
+
+          usejs(os.cssjs["datagrid_view"],function(){
+        			$("#tt").datagrid({
+        				url: null,
+        				view:scrollview,
+        				rownumbers:true,
+        				pageSize:20,
+        				singleSelect:true
+        			});
+              $('#tt').datagrid('loadData', rows);
+          });
+
+            
+
+        });
+    </script>

@@ -1,0 +1,238 @@
+﻿<SCRIPT type="text/javascript">
+os.apps={//定义os app
+	app_mycomputer:{
+		name:"我的电脑",
+		html:"apps/mycomputer/tpl_app_mycomputer.html",
+		img:"imgaes/icon11.png"	
+	},
+	app_PLSQL:{
+		name:"PLSQL",
+		html:"apps/PLSQL/tpl_app_PLSQL.html",
+		img:"imgaes/icon12.png"	
+	},
+	app_datagrid_scrollview:{
+		name:"datagrid_大数据异步加载",
+		html:"apps/datagrid-scrollview/tpl_app_datagrid_scrollview.html",
+		img:"imgaes/icon13.png"	
+	},
+	app_database:{
+		name:"database",
+		html:"apps/database/database.html",
+		img:"imgaes/icon13.png"	
+	},
+	app_jquery_zclip:{
+		name:"jquery_zclip",
+		html:"apps/zclip/tpl_app_jquery_zclip.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_portal:{
+		name:"portal",
+		html:"apps/portal/portal.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_baidu:{
+		name:"百度",
+		html:"http://www.baidu.com",
+		img:"imgaes/icon14.png"	
+	},
+	app_ueditor:{
+		name:"ueditor",
+		html:"apps/ueditor/ueditor.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_ueditor_config:{
+		name:"ueditor_config",
+		html:"apps/ueditor/ueditor_config.html",
+		img:"imgaes/icon14.png"	
+	},
+/*	app_groupview:{
+		name:"groupview",
+		html:"apps/datagrid-scrollview/datagrid-groupview.html",
+		img:"imgaes/icon14.png"	
+	},*/
+	app_uem:{
+		name:"um",
+		html:"apps/um/um.html",
+		img:"imgaes/icon14.png"	
+	},	
+	app_jquerymb:{
+		name:"jquerymb",
+		html:"http://127.0.0.1:8102/apps/jquerymb/jquerymb.html",
+		img:"imgaes/icon14.png"	,
+		hw:[480,320]
+	},	
+	app_raphael:{
+		name:"Raphael-huahua",
+		html:"apps/raphael/Raphael-huahua.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_zdyjm:{
+		name:"自定义界面",
+		html:"apps/zdyjm/zdyjm.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_zdyJS:{
+		name:"自定义js",
+		html:"apps/zdyjm/zdy_js.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_zdyhtml:{
+		name:"自定义html",
+		html:"apps/zdyjm/zdy_htm.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_word:{
+		name:"word",
+		html:"apps/ueditor/word.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_excel:{
+		name:"excel",
+		html:"apps/excel/excel.html",
+		img:"imgaes/icon14.png"	
+	},
+	app_footable:{
+		name:"footable",
+		html:"http://127.0.0.1:8102/apps/footable/footable.html",
+		img:"imgaes/icon14.png"	
+	}
+}	
+
+
+
+$(function(){
+ 
+   for(var i in os.apps){//初始化app 
+	   var $li=$("<li><button id="+i+" go="+os.apps[i]["html"]+"><img src="+os.apps[i]["img"]+" />"+os.apps[i]["name"]+"</button></li>");
+		$(".win_app").append($li);
+	}
+	
+	
+	
+	usejs(os.cssjs.database, function() {
+ 
+		var apps=os.sql.sqls.查询表数据 ("ZDY");
+		for(var i in apps){//初始化app 
+			var $li=$("<li><button onclick='"+apps[i]['DM']+"' ><img src='imgaes/icon14.png' />"+apps[i]["NAME"]+"</button></li>");
+			(function(i){$li.click(function(){
+				var $win=$('<div></div>');
+
+				$win.appendTo($("body")).window({  //显示
+				    title:apps[i]["NAME"],
+					width:800,
+					height:500 
+				});	
+	 	  		var html=apps[i]["HTML"].replace(/回车/g,"\n");
+				var css=apps[i]["CSS"].replace(/回车/g,"\n").replace(/井/g,"#");
+				var js=apps[i]["JS"].replace(/回车/g,"\n");
+				
+				$win.append(html);
+				$win.append("<style>"+css+"</style>");
+				$win.append(js);
+			});})(i)
+			$(".win_app").append($li);
+		}
+    });	
+	
+	
+/* <li>
+		<button id="app_mycomputer" go="tpl_app_mycomputer.html">
+		<img src="imgaes/icon11.png" />我的电脑</button>
+	</li>*/
+
+	$(".win_app button").click(function(){//app点击事件
+		var url=$(this).attr("go");//获取跳转的html
+		var title=$(this).text();//获取app名字,作为弹出框标题
+		var win_class="class_"+$(this).attr("id");//根据id 生成class,
+		
+		$("."+win_class).window('close').parent().html("").remove();//二次点击时先关闭并销毁之前的,通过win_class 实现
+ 
+		var $win=$('<div class="'+win_class+'" >正在加载...</div>');
+
+
+		
+		if ( $(this).attr("id")=="app_jquerymb"){
+			$win.appendTo($("body")).window({  //显示
+				title:title,
+				width:320,
+				height:480 
+			});	
+			$(".class_app_jquerymb").css("overflow","hidden");
+		}else{
+			$win.appendTo($("body")).window({  //显示
+				title:title,
+				width:800,
+				height:500 
+			});	
+			$(".class_app_excel").css("overflow","hidden");
+		}
+			
+		if (url.substring(0,4)=="http"){
+			$win.html("<iframe src='"+url+"' class='win_iframe' ></iframe>");
+		}else{
+			$.ajax({ //加载app页面
+				url: url, 
+				success: function(data){
+					$win.html(data);
+ 					$.parser.parse();
+				}
+			}); 
+		}
+		$(".window-shadow").remove();
+	});
+	
+
+/*	$(".win_app button").bind('contextmenu',function(e){
+		e.stopPropagation()
+		e.preventDefault();
+    });*/
+});
+
+</SCRIPT>
+<style>
+.win_app {
+	height: 80%;
+/*	writing-mode: tb-lr;
+	-webkit-column-count: 12;
+	-moz-column-count: 12;*/
+	marign: 0;
+	padding: 0;
+}
+.win_app li {
+	display: block;
+	float: left;
+	clear: right;
+/*	writing-mode: lr-tb;*/
+	list-style: none;
+	width: 110px;
+	height: 110px;
+}
+.win_app button {
+	background: none;
+	border: none;
+	width: 80px;
+	height: 80px;
+	text-align: center;
+}
+.win_app button:hover {
+	background: #09F;
+	opacity: 0.6;
+}
+.win_app button img {
+	display: block;
+	margin: 0 auto;
+}
+.win_iframe {
+	width:100%;	
+	height:100%;
+	border:none;
+}
+</style>
+ 
+<object style="z-index:-1;position:absolute;" classid="clsid:F08DF954-8592-11D1-B16A-00C0F0283628" ></object>
+<iframe style="z-index:-1;position:absolute;left:20px;" ></iframe>
+
+<a href="#" title="这真的是tooltip" class="easyui-tooltip" >这是tooltip</a>
+<ul class="win_app" ></ul>
+
+  

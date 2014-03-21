@@ -1,0 +1,130 @@
+<script>
+$(function(){
+	$("#实例_js_textarea,#实例_css_textarea,#实例_html").change(function(){
+		$("#实例").html($("#实例_html").val());
+		$("#实例_js").html($("#实例_js_textarea").val());
+		$("#实例_css").text($("#实例_css_textarea").val());
+	});
+	
+	$("#INSERT_zdy").click(function(){
+ 
+		var html=$("#实例_html").val().replace(/\n/g,"回车") ;
+		var css=$("#实例_css_textarea").val().replace(/\n/g,"回车").replace(/#/g,"井");
+		var js=$("#实例_js_textarea").val().replace(/\n/g,"回车") ;
+		var NAME=$("#zdy_name").val();
+		os_sql("INSERT INTO ZDY (ID,NAME,CSS,HTML,JS) VALUES ("+ os.sql.get_seq()+",'"+NAME+"','"+css+"','"+html+"','"+js+"') ");
+	});
+	
+	
+	$("#UPDATE_zdy").click(function(){
+ 
+		var html=$("#实例_html").val().replace(/\n/g,"回车") ;
+		var css=$("#实例_css_textarea").val().replace(/\n/g,"回车").replace(/#/g,"井");
+		var js=$("#实例_js_textarea").val().replace(/\n/g,"回车") ;
+		var NAME=$("#zdy_name").val();
+		var ID=$("#zdy_name").attr("data_id");
+		os_sql("UPDATE ZDY SET NAME ='"+NAME+"' , CSS ='"+css+"' ,HTML ='"+html+"' ,JS ='"+js+"'  where id ='"+ID+"'");
+	});
+	
+	$("#delete_zdy").click(function(){
+ 		var id =$("#zdy_name").attr("data_id");
+		os_sql("delete from  ZDY where id = "+ id);
+	});
+	
+	var west=os_sql("select ID,NAME from ZDY ");
+ 	if(west.length>0){
+ 		$("#zdy_west").html(function(){
+			var $ul=$("<ul></ul>");
+			for (var i in west){
+				var $li=$("<li data_id='"+west[i]["ID"]+"'>"+west[i]["NAME"]+"</li>");
+				
+				(function(){
+					$li.click(function(){
+						var id=$(this).attr("data_id");
+						var row=os_sql("select * from ZDY where id= '"+id+"' ");
+						
+						var html=row[0]["HTML"].replace(/回车/g,"\n");
+						var css=row[0]["CSS"].replace(/回车/g,"\n").replace(/井/g,"#");
+						var js=row[0]["JS"].replace(/回车/g,"\n");
+						var name=row[0]["NAME"];
+						var id=row[0]["ID"];
+						$("#zdy_name").val(name).attr("data_id",id);
+						$("#实例").html(html);
+						$("#实例_js").html(js);
+						$("#实例_css").text(css);	
+						
+						$("#实例_html").val(html);
+						$("#实例_js_textarea").val(js);
+						$("#实例_css_textarea").val(css);
+ 		
+				});})()
+				$ul.append($li);
+			}
+				
+			return $ul;
+		});
+	}	
+		
+
+
+	
+});
+</script>
+<style>
+.sheji {
+	position: absolute;
+	width: 50%;
+	height: 50%;
+}
+ 
+#实例_html,#实例_js_textarea ,#实例_css_textarea {	
+	height: 100%;
+	width: 100%;
+	padding:0;
+	margin:0;
+	display: block;
+ }
+</style>
+<div class="easyui-layout" data-options="fit:true">
+<div data-options="region:'center'">
+
+<div class="sheji" style="left:0;top:0;">
+<textarea id="实例_js_textarea"><script>
+$("label").click(function(){
+alert(111)
+});
+
+</script></textarea>
+<div id="实例_js"></div>
+</div>
+
+
+<div class="sheji" style="right:0;top:0;">
+<textarea id="实例_css_textarea"> 
+#实例{border: 1px solid #ccc; background: #fff; }
+</textarea>
+<style id="实例_css" ></style>
+</div>
+
+
+<div class="sheji" style="bottom:0;left:0;">
+<textarea id="实例_html">
+<label>单选</label>
+</textarea>
+</div>
+
+
+<div class="sheji easyui-layout" id="实例"  style="right:0;bottom:0; overflow:auto;"  ></div>
+
+
+</div>
+<div data-options="region:'south'" style="overflow:hidden;" > 
+	<input  id="zdy_name"/>
+    <button id="INSERT_zdy">INSERT</button>
+    <button id="UPDATE_zdy">UPDATE</button>
+    <button id="delete_zdy">delete</button>
+</div>
+<div data-options="region:'west'" style="width:100px;"  id="zdy_west"> 
+ 
+</div>
+</div>

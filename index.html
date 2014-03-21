@@ -1,0 +1,266 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="themes/icon.css">
+
+<script type="text/javascript" src="jquery_1.10.js"></script>
+<script type="text/javascript" src="jquery.easyui.min_1.3.5.js"></script>
+<script type="text/javascript" src="apps/PLSQL/webSQL.js"></script>
+<script type="text/javascript" src="apps/datagrid-scrollview/datagrid-scrollview.js"></script>
+<!--<script type="text/javascript" src="apps/datagrid-scrollview/datagrid-dnd.js"></script>-->
+<!--<script type="text/javascript" src="apps/datagrid-scrollview/jquery.edatagrid.js"></script>-->
+
+<!--<script type="text/javascript" src="apps/portal/jquery.portal.js"></script>-->
+<!--<link rel="stylesheet" type="text/css" href="apps/portal/portal.css">-->
+
+<script type="text/javascript" src="apps/raphael/raphael.js"></script>
+
+
+
+
+<SCRIPT type="text/javascript">
+
+	var os ={//系统方法
+		i:0,
+		info:function(info){
+			 
+			os.i=os.i+1;
+			//console.info(os.i);
+			console.info(info);//打印后台日志
+		},
+		dir:function(dir){
+			console.dir(dir);	
+		},
+		tips:function(str){
+			alert(str)	
+			
+		},
+		cssjs:{
+			ztree:{
+				src:"",
+				css:["apps/mycomputer/zTreeStyle.css"],
+				js:["apps/mycomputer/jquery.ztree.all-3.5.js"]
+            },
+			database:{
+        		js: ["apps/database/database.js", "apps/database/toolbar_pt.js", "apps/database/toolbar_mb.js", "apps/database/toolbar_west.js", "apps/database/toolbar_dtb.js"]
+   			},
+			ueditor:{
+				src:"",
+				css:[],
+				js:["apps/ueditor/ueditor.config.js","apps/ueditor/ueditor.all.min.js","apps/ueditor/lang/zh-cn/zh-cn.js"]
+			},
+			datagrid_view:{
+				src:"apps/datagrid-scrollview/",
+				css:[],
+				js:["datagrid-dnd.js","datagrid-scrollview.js","jquery.edatagrid.js"]
+			},
+
+			portal:{
+				src:"",
+				css:["apps/portal/portal.css"],
+				js:["apps/portal/jquery.portal.js"]
+			},
+			um:{
+				src:"",
+				js:["apps/um/umeditor.config.js","apps/um/umeditor.min.js","apps/um/lang/zh-cn/zh-cn.js"],
+				css:["apps/um/themes/default/_css/umeditor.css"],
+			}
+		}
+
+	
+	}
+
+/*
+$(function(){
+	$(document).bind("selectstart",function() {return false;});	
+});*/
+
+
+ 
+
+
+
+
+
+function usejs(obj,fn){
+	if(obj.src==undefined){
+		obj.src="";
+	}
+ 
+ 	for (var ii in obj.css){
+		if (os.cssjs[obj.src +obj["css"][ii]]==1){
+			os.info("(css)第"+(ii+1)+"个样式:"+obj.src +obj.css[ii]+"加载过了,跳过.");
+		}else{
+			os.info("(css)请求加载第"+(ii+1)+"个样式:"+obj.src +obj.css[ii]);
+			os.cssjs[obj.src +obj["css"][ii]]=1;
+			$("head").append($('<link rel="stylesheet" type="text/css" href="'+obj.src +obj.css[ii]+'">'));
+			os.info("(css)第"+(ii+1)+"个样式:"+obj.src +obj.css[ii]+"加载完毕");
+		}
+	}
+ 
+
+	var i=0;
+	getjs(obj.js,fn);
+	function getjs(jsarr,fn){
+		$.ajaxSetup({cache: true});
+		if (i<jsarr.length-1){
+			os.info("(1)请求加载第"+(i+1)+"个js:"+obj.src +jsarr[i]);
+			if (os.cssjs[obj.src +jsarr[i]]==1){
+				os.info("(1-1)第"+(i+1)+"个js已经加载过,跳过.");
+				i=i+1;
+				getjs(jsarr,fn);
+			}else {
+				$.getScript(obj.src +jsarr[i], function(){
+					os.info("(1-2)第"+(i+1)+"个js加载完毕!");
+					os.cssjs[obj.src +jsarr[i]]=1;
+					i=i+1;
+					getjs(jsarr,fn);
+					
+				});
+			}
+		}else{
+			os.info("(2)请求加载第"+(i+1)+"个js(最后一个):"+obj.src +jsarr[i]);
+			if (os.cssjs[obj.src +jsarr[i]]==1){
+				os.info("(2-1)第"+(i+1)+"个js(最后一个)已经加载过,跳过. 直接执行方法.");
+				i=i+1;
+				fn();
+				os.info("(2-2)方法执行完毕.");
+			}else {
+				$.getScript(obj.src +jsarr[i], function(){
+					os.info("(2-3)第"+(i+1)+"个js(最后一个)已经加载完毕,现在执行方法.");
+					os.cssjs[obj.src +jsarr[i]]=1;
+					fn();
+					os.info("(2-4)方法执行完毕.");
+				});
+			}
+		}
+		$.ajaxSetup({cache: false});
+	}
+}
+
+
+	
+function os_sql(str) {
+	var data = "sql=" + encodeURI(str);
+	os.info("sql语句: " + str);
+	//os.info("url编码: " + data);
+
+	var s=data.substring(0,20);
+
+	if (/select|SELECT/.test(s)) {
+		var obj = {};
+		$.ajax({
+			url: "apps/database/oracle.jsp",
+			data: data,
+			async: false,
+			success: function(a) {
+				obj = eval(a.replace(/=/g, ":"));
+				//os.info("成功!");
+				os.info(obj);
+			}
+		});
+		return obj;
+	} else {
+		$.ajax({
+			url: "apps/database/oracle_noback.jsp",
+			data: data,
+			async: false,
+			success: function() {
+				os.info("成功!");
+			}
+		});
+	}
+}	
+
+
+function init_page (c,url){  //载入界面
+	$.ajax({ 
+		url: url, 
+		success: function(data){
+		 $(c).html(data);
+		 $.parser.parse();
+		}
+	});
+}
+
+
+function for_in(obj){//查看对象内容
+	var text="";
+	for (var i in obj){
+		var o=obj[i];
+	//	if (typeof(obj[i])=="function"){ o="function(){...}" ;}
+		text+=i+":"+o+" , \n";
+ 
+	}
+	
+	os.info (text);
+}
+
+function t1_t2(fn,config){
+	var t1= new Date();
+	fn(config);
+	var t2=new Date();
+	os.info(t1-t2)
+}
+
+$(document).on("mousedown",".window .panel-tool-close",function(){//算了不改了(关于  点击关闭按钮 销毁 dom)
+	//$(this).parent().parent().parent().next().remove();
+	//$(this).parent().parent().parent().remove();
+});
+
+
+
+ 	$(document).on("mousedown",".window-header",function(){//改进easyui  ..框选处理
+		$("<input/>").appendTo("body").select().remove();
+	});
+	$(document).on("dblclick",".window-header",function(){//双击最大化
+		$(".panel-tool-max",this).click();
+	});
+
+
+ 	$(document).on("click",".l-btn-left",function(e){ 
+		e.stopPropagation();
+	}); 
+ 	$(document).on("click",".window-body",function(){ 
+		$(this).window('open'); 
+	}); 
+
+
+$(function(){
+
+});
+</SCRIPT>
+<style>
+body {
+	background: url(imgaes/bg.gif) no-repeat center;
+}
+.win_panel {
+	background: none;
+	border: none;
+}
+.win_bottom {
+	height: 40px;
+	line-height: 40px;
+	overflow: hidden;
+}
+</style>
+</head>
+<body class="easyui-layout" >
+<!--<div data-options="region:'north'" class="win_panel" style="height:0px"></div>
+<div data-options="region:'west'" class="win_panel"  style="width:0px;"></div>
+<div data-options="region:'east'" class="win_panel" style="width:0px;"></div>-->
+<div data-options="region:'center'" class="win_panel win_center" > 
+<script>
+	init_page (".win_center","tpl_center.html");
+</script> 
+</div>
+<div data-options="region:'south'" style="" class="win_panel win_bottom"> 
+<script>
+	init_page (".win_bottom","tpl_bottom.html");
+</script> 
+</div>
+</body>
+</html>

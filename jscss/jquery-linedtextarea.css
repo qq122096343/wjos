@@ -1,0 +1,65 @@
+body {margin:0;}
+textarea {
+	width: 90%;
+	height: 70%;
+	border: 1px solid #bbb;
+	background: #eee;
+	padding: 5px;
+}
+.error, .notice, .success {
+	margin-bottom: 1em;
+	border: 2px solid #ddd;
+	padding: .8em;
+}
+.error {
+	background: #FBE3E4;
+	color: #D12F19;
+	border-color: #FBC2C4;
+}
+.notice {
+	background: #FFF6BF;
+	color: #817134;
+	border-color: #FFD324;
+}
+.success {
+	background: #E6EFC2;
+	color: #529214;
+	border-color: #C6D880;
+}
+
+.linedwrap {
+	border: 1px solid #c0c0c0;
+	padding: 3px;
+	display: inline-block;
+}
+.linedtextarea {
+	padding: 0px;
+	margin: 0px;
+}
+.linedtextarea textarea, .linedwrap .codelines .lineno {
+	font-size: 10pt;
+	font-family: monospace;
+	line-height: normal !important;
+}
+.linedtextarea textarea {
+	padding-right: 0.3em;
+	padding-top: 0.3em;
+	border: 0;
+}
+.linedwrap .lines {
+	margin-top: 0px;
+	width: 50px;
+	float: left;
+	overflow: hidden;
+	border-right: 1px solid #c0c0c0;
+	margin-right: 10px;
+}
+.linedwrap .codelines { padding-top: 5px; }
+.linedwrap .codelines .lineno {
+	color: #AAAAAA;
+	padding-right: 0.5em;
+	padding-top: 0.0em;
+	text-align: right;
+	white-space: nowrap;
+}
+.linedwrap .codelines .lineselect { color: red; }

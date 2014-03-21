@@ -1,0 +1,52 @@
+﻿<SCRIPT type="text/javascript">
+$(function(){
+	$('#mb').menubutton({
+		menu: '#mm'
+	});	
+});
+
+
+ 
+</SCRIPT>
+<style>
+.win_bottom_bg {
+	background: #fff;
+	-moz-opacity: 0.5;
+	-webkit-opacity: 0.5;
+	opacity: 0.5;
+	filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	z-index: -1;
+}
+
+</style>
+
+<div class="win_bottom_bg"></div>
+<button id="mb" style=" background:#FFF;">开始</button>
+<div id="mm" style="width:150px;">
+  <div data-options="iconCls:'icon-undo'">Undo</div>
+  <div data-options="iconCls:'icon-redo'">Redo</div>
+  <div class="menu-sep"></div>
+  <div>Cut</div>
+  <div>Copy</div>
+  <div>Paste</div>
+  <div class="menu-sep"></div>
+  <div> <span>Toolbar</span>
+    <div style="width:150px;">
+      <div>Address</div>
+      <div>Link</div>
+      <div>Navigation Toolbar</div>
+      <div>Bookmark Toolbar</div>
+      <div class="menu-sep"></div>
+      <div>New Toolbar...</div>
+    </div>
+  </div>
+  <div data-options="iconCls:'icon-remove'">Delete</div>
+  <div>Select All</div>
+</div>
+ 
+ 
+  
+<span style="float:right;">2014-1-17 17:06</span>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width = device-width, initial-scale = 1.0, minimum-scale = 1.0, maximum-scale = 1.0, user-scalable = no"/>
+<link href="cssjs/bootstrap.css" rel="stylesheet" type="text/css"/>
+<link href="cssjs/footable.core.css?v=2-0-1" rel="stylesheet" type="text/css"/>
+<script src="cssjs/jquery_1.10.js" type="text/javascript"></script>
+<script src="cssjs/footable.js?v=2-0-1" type="text/javascript"></script>
+<script src="cssjs/footable.sort.js?v=2-0-1" type="text/javascript"></script>
+<script src="cssjs/footable.filter.js?v=2-0-1" type="text/javascript"></script>
+<script src="cssjs/footable.paginate.js?v=2-0-1" type="text/javascript"></script>
+<script src="cssjs/bootstrap-tab.js" type="text/javascript"></script>
+<script src="../../os.js" type="text/javascript"></script>
+<script src="json.js" type="text/javascript"></script>
+<style>
+.yhlc_label label {float:left; line-height:30px;height:30px;  padding:0 2px;}
+</style>
+</head>
+<body>
+<p class="yhlc_label">
+  <label style="display:none;">搜索:
+    <input id="filter" type="text"/>
+  </label>
+  <label>状态:
+    <select class="filter-status">
+      <option>全部</option>
+      <option>保守型</option>
+      <option>激进型</option>
+      <option>稳健型</option>
+    </select>
+  </label>
+<!--  <label>
+  	<a href="#clear" class="clear-filter" title="clear filter">清除搜索</a> <span class="row-count"></span> 
+  </label>-->
+  </p>
+<!-- data-name="Date Of Birth"   缩放时显示的文字-->
+<table class="table" id="银行理财" data-filter="#filter" data-page-size="5">
+  <thead>
+    <tr>
+      <th data-toggle="true">理财名称</th>
+      <th data-hide="phone" >投资起始金额</th>
+      <th data-hide="phone"> 投资周期 </th>
+      <th data-hide="phone,tablet"> 预期收益率 </th>
+      <th data-hide="phone,tablet"> 风险偏好 </th>
+      <th data-hide="phone,tablet">联系方式 </th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  <tfoot class="hide-if-no-paging">
+    <tr>
+      <td colspan="6"><div class="pagination pagination-centered"></div></td>
+    </tr>
+  </tfoot>
+</table>
+<script type="text/javascript">
+    $(function () {
+		 $('#银行理财 tbody').html(function(){
+		//	var rows= os_sql("SELECT * FROM YHLC ");
+			
+		
+			
+			
+			var $tbody=$("<tbody></tbody>");
+			for (var i in rows){
+				var $tr=$("<tr></tr>");
+				$tr.append("<td>"+rows[i]["LCMC"]+"</td>");
+/*				
+
+				*/
+				
+				$tr.append("<td>"+rows[i]["TZQSJE"]+"</td>");
+				$tr.append("<td>"+rows[i]["TZZQ"]+"</td>");
+				$tr.append("<td>"+rows[i]["YQSYL"]+"</td>");
+				$tr.append("<td>"+rows[i]["FXPH"]+"</td>");
+				$tr.append("<td>"+rows[i]["TZLY"]+"</td>");
+				$tbody.append($tr);
+			}
+			return $tbody.children(); 
+		});
+		
+		
+        $('#银行理财').footable().bind({ 'footable_filtering': function (e) {
+				var text=$('.filter-status').find(':selected').text();
+				if (text=="全部"){
+					var selected = "";
+				}else {
+					var selected = text;	
+				}
+                if (selected && selected.length > 0) {
+                    e.filter += (e.filter && e.filter.length > 0) ? ' ' + selected : selected;
+                    e.clear = !e.filter;
+                }
+            },
+            'footable_filtered': function() {
+                var count = $('#银行理财 tbody tr:not(.footable-filtered)').length;
+                $('.row-count').html(count + ' 个找到');
+            }
+        });
+
+        $('.clear-filter').click(function (e) {
+            e.preventDefault();
+            $('.filter-status').val('');
+            $('#银行理财').trigger('footable_clear_filter');
+            $('.row-count').html('');
+        });
+
+        $('.filter-status').change(function (e) {
+            e.preventDefault();
+            $('#银行理财').data('footable-filter').filter( $('#filter').val() );
+        });
+    });
+</script>
+</body>
+</html>

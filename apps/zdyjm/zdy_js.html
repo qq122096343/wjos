@@ -1,0 +1,128 @@
+﻿<script>
+$(function(){
+	$("#delete_JS").click(function(){
+		var id=$(".zdy_west_hover").text();
+		var row=os_sql("delete from ZDYJS where id= '"+id+"' ");
+		select_zdyjs ();
+	}); 
+	
+	$("#DO_JS").click(function(){
+		$("#实例_js").html($("#实例_js_textarea").val());
+	});
+	$("#save_JS").click(function(){
+		var js=$("#实例_js_textarea").val().replace(/\n/g,"回车").replace(/=/g,"等于号").replace(/\+/g,"加号").replace(/'/g,"单引号") ;
+		os_sql("INSERT INTO ZDYJS (ID,JS) VALUES ("+ os.sql.get_seq()+",'"+js+"') ");
+		select_zdyjs ();
+	});
+	function select_zdyjs (){
+		var west=os_sql("select ID from ZDYJS ");
+		if(west.length>0){
+			$("#zdy_west").html(function(){
+				var $ul=$("<ul></ul>");
+				for (var i in west){
+					var $li=$("<li>"+west[i]["ID"]+"</li>");
+					
+ 
+					$ul.append($li);
+				}
+					
+				return $ul;
+			});
+		}	
+		
+	}
+
+	select_zdyjs ();
+
+ 
+
+
+os.sb=function(){
+	var id=1;
+	var t1=new Date();
+	function aa(){
+		var res=os_sql("select ND,RQ,DWBH from jsb where id="+id);
+		var ND=res[0]["ND"];
+		var RQ=res[0]["RQ"];
+		var DWBH=res[0]["DWBH"];
+		var res2=os_sql("select XM,SFZ from ybg where ND="+ND+" and RQ="+RQ+" AND DWBH="+DWBH);
+		var hb="";
+		
+		$(res2).each(function(i, element) {
+			hb +=res2[i]["XM"] + res2[i]["SFZ"]+";"
+		});
+			
+		os_sql("update jsb set hbzd='"+hb+"' where id="+id);
+		
+		$("#第几个").text("第"+id+"个");
+		
+		id=id+1;
+		
+		if(id <= 100){
+			setTimeout(aa,0);
+		}else {
+			var t2=new Date();
+			alert(t2-t1);
+		}
+	}
+	aa();
+}
+
+
+
+
+
+
+	
+});
+
+
+$(document).unbind("click").on("click","#zdy_west li",function(){
+	$(".zdy_west_hover").removeClass("zdy_west_hover");
+	$(this).addClass("zdy_west_hover");
+	
+	var id=$(this).text();
+	var row=os_sql("select * from ZDYJS where id= '"+id+"' ");
+	
+	var js=row[0]["JS"].replace(/回车/g,"\n").replace(/等于号/g,"=").replace(/加号/g,"+").replace(/单引号/g,"'") ;
+
+	$("#实例_js_textarea").val(js);
+	
+});
+</script>
+<style>
+.zdy_west_hover{
+	border:1px solid #000;
+}
+#实例_js_textarea {	
+	height: 100%;
+	width: 100%;
+	padding:0;
+	margin:0;
+	display: block;
+ }
+</style>
+<div class="easyui-layout" data-options="fit:true">
+<div data-options="region:'center'" style="overflow:hidden;">
+
+
+<textarea id="实例_js_textarea"><script>
+$("label").click(function(){
+alert(111)
+});
+
+</script></textarea>
+<div id="实例_js"></div>
+
+
+
+</div>
+<div data-options="region:'south'" style="overflow:hidden;" > 
+    <button id="DO_JS">DO_JS</button><button id="save_JS">save_JS</button><button id="delete_JS">delete_JS</button><button id="第几个"> </button>
+    <button onclick="os.sb()">sb</button>
+
+</div>
+<div data-options="region:'west'" style="overflow:hidden; width:100px;" id="zdy_west"  > 
+ 
+</div>
+</div>

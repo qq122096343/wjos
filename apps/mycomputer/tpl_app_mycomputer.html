@@ -1,0 +1,562 @@
+﻿<style>
+ul.os_rightmenu {
+	margin: 0;
+	height: 100%;
+}
+.os_folder {
+	background: #CCC;
+}
+.os_file {
+	background: #99F;
+}
+#os_center .datagrid-body td {
+	border: none;
+}
+#os_center .datagrid-header {
+	background: none;
+	border-color: #fff;
+}
+#os_center .datagrid-row-selected {
+	background: #D1E8FF;
+}
+#os_center  .datagrid-row-selected td {
+	border-top: #9ECEFF solid 1px;
+	border-bottom: #9ECEFF solid 1px;
+}
+.ztree li span.button.folder_ico_open {
+	background-position: -110px -16px;
+}
+.ztree li span.button.folder_ico_close {
+	background-position: -110px 0;
+}
+.ztree li span.button.folder_ico_docu {
+	background-position: -110px 0;
+}
+#treeDemo_1_ico {
+	background: url(img/diy/1_open.png) no-repeat;
+}
+.os_ico {
+	display: block;
+	width: 16px;
+	height: 16px;
+	background: url(img/zTreeStandard.png)  no-repeat;
+}
+</style>
+<SCRIPT type="text/javascript">
+var PC = {
+	
+	pc_title:{},
+	pc_tree:{},
+	pc_tree_obj:{},
+	pc_grid:{},
+	pc_folder:{},
+	init_PC:function(){
+		PC.pc_title=$("#os_lj");
+		PC.pc_folder=$("#os_center");
+		PC.pc_grid=$("#os_grid");
+		PC.pc_tree=$("#treeDemo");
+	},
+	get_pc_title:function(treeNode){
+		var os_lj = "";
+		var tnd = treeNode;
+		for (var i = 0; i <= treeNode.level; i++) {
+			os_lj = "\\" + $("#" + tnd.tId + "_a").text() + os_lj;
+			tnd = tnd.getParentNode();
+		}
+		return "我的电脑:" + os_lj;
+	},
+	build_folder:function(treeNode){
+		var json = {rows: [] };
+		var sql = "select * from tree where  pid='" + treeNode.id + "' order by type desc";
+		var fn = function(tx, result) {
+			for (var i = 0; i < result.rows.length; i++) {
+				json["rows"].push(result["rows"].item(i));
+			}
+			PC.pc_grid.datagrid('loadData', json);
+		}
+		sql_back(sql, fn);
+	},
+	tree: {
+		setting: {
+			callback: {
+				//	beforeAsync : function(){ alert("异步加载之前") },
+				//	beforeClick : function(){   },
+				//	beforeDblClick : function(){ alert("双击事件之前") },
+				//	beforeCollapse : function(){ alert("父节点折叠之前") },
+				//	beforeExpand : function(){ alert("父节点展开之前") },
+				//	beforeMouseDown :function(){ alert("鼠标点下去了") },
+				//	beforeMouseUp :function(){ alert("鼠标点好了") },
+				//	beforeRightClick :  function(){ alert("before右键") },
+				//	onAsyncError : function(){ alert("异步加载失败") },
+				//	onAsyncSuccess : function(){ alert("异步加载成功") },
+				onClick: function(event, treeId, treeNode, clickFlag) { //树点击事件
+					PC.pc_folder.attr("data-rightmenu", "文件夹内右键");//为文件夹区域绑定右键事件
+					PC.pc_folder.attr("data-folderid", treeNode.id); //提供 tree节点id
+					PC.pc_title.html(PC.get_pc_title(treeNode));//点击更新 title
+					PC.pc_title.attr("data-lujing", PC.grid["查询路径"](treeNode));//在title 上 存储 路径信息
+					PC.build_folder(treeNode);//加载文件夹区域数据
+ 
+				},
+				//	onCollapse : function(){ alert("父节点折叠") },
+				//	onExpand : function(){ alert("父节点展开") },
+				//	onDblClick :  function(){ alert("双击事件") },
+				//	onMouseDown : null,
+				//	onMouseUp : null,
+				//	onNodeCreated : null,
+				onRightClick: function(e, treeId, treeNode) {
+					e.preventDefault();//禁止默认右键事件
+					os.info("当前选中节点id:" + treeNode.id); 
+					//$.fn.zTree.getZTreeObj(treeId).selectNode(treeNode);
+/*					$("#rightmenu_文件夹区域右键").menu('show', {
+						left: e.pageX,
+						top: e.pageY
+					});*/
+				}
+			},
+			data: {
+				key: {
+					name: "name", //指定tree文字字段
+					title: "t" //指定文字的title 就是,鼠标移上去的提示
+				},
+				simpleData: {
+					enable: true,
+					//true 为 简单树
+					idKey: "id",
+					// 指定id 
+					pIdKey: "pid" //指定父id
+				}
+			},
+			view: {
+				autoCancelSelected: true,
+				//节点二次点击 取消选择,开关。
+				dblClickExpand: false,
+				//双击节点 ,展开父节点 ,开关
+				expandSpeed: 0,
+				//展开节点的速度,("slow", "normal","fast") , 数字
+				fontCss: {},
+				//指定 节点文字样式 fontCss : {color:"red"}
+				nameIsHTML: false,
+				//设置 name 属性是否支持 HTML 脚本
+				selectedMulti: true,
+				// Ctrl 键 多选, 开关 
+				showIcon: true,
+				//文件夹图标的开关
+				showLine: true,
+				//文件夹层次的开关
+				showTitle: false,
+				//文字提示的开关
+				txtSelectedEnable: false //设置节点的文本能否选中
+			}
+
+		},
+		zNodes: [],
+		tree_lastselect: "",
+		init_tree: function() {
+			PC.tree.zNodes = [];
+			var sql = "select * from tree where type='folder' ";
+			var fn = function(tx, result) {
+				for (var i = 0; i < result.rows.length; i++) {
+					PC.tree.zNodes.push(result["rows"].item(i));//数据放入数组
+				}
+				$.fn.zTree.init(PC.pc_tree, PC.tree.setting, PC.tree.zNodes); //对象,设置,数据
+				PC.pc_tree_obj=$.fn.zTree.getZTreeObj(PC.pc_tree.attr("id"));  //存储树对象
+				PC.pc_tree_obj.expandAll(true);//展开树
+				if(PC.tree.tree_lastselect==""){
+					PC.tree.tree_lastselect=PC.pc_tree.attr("id")+"_1";
+				} 
+				$("#" + PC.tree.tree_lastselect + "_a").click();//点击最后选中的节点
+			}
+			sql_back(sql, fn);
+		},
+		refresh_tree: function() {//刷新树
+			PC.tree.tree_lastselect = PC.pc_tree_obj.getSelectedNodes()[0].tId;//存储最后的节点
+			PC.tree.init_tree();
+		}
+
+	},
+ 
+	
+	grid: {
+		grid_type:"datagrid",
+		toolbar : [{
+            text:'新增',
+            handler:function(){
+				 
+					var $dlg=$('<div></div>').html(function(){
+							var $table=$("<table></table>");
+							for(var i in PC.grid.columns[0]){
+								var c=PC.grid.columns[0][i];
+								var $tr=$("<tr><td>"+c["title"]+"["+c["field"]+"]</td><td><input type='text' data-field='"+c["field"]+"' /></td></tr>");
+								$table.append($tr);
+							}
+							return $table;
+						}).dialog({
+							title:"新增信息",
+							buttons: [{
+								text:'确认',
+								handler:function(){
+								 
+								}
+							},{
+								text:'取消',
+								handler:function(){
+									$dlg.dialog('close');
+								}
+							}]
+						
+						});
+			 
+			}
+        },{
+            text:'修改',
+            handler:function(){
+				var row=PC.pc_grid.datagrid("getSelected");
+				if (row!=null){
+					os.info(row)
+					os.info(PC.grid.columns)
+					var $dlg=$('<div></div>').html(function(){
+							var $table=$("<table></table>");
+							for(var i in PC.grid.columns[0]){
+								var c=PC.grid.columns[0][i];
+								var $tr=$("<tr><td>"+c["title"]+"["+c["field"]+"]</td><td><input type='text' data-field='"+c["field"]+"' value='"+row[c["field"]]+"'/></td></tr>");
+								$table.append($tr);
+							}
+							return $table;
+						}).dialog({
+							title:"修改信息",
+							buttons: [{
+								text:'确认',
+								handler:function(){
+									var obj=[];
+									$("table input",$dlg).each(function() {
+										if ($(this).attr("data-field")=="id"){
+											obj[$(this).attr("data-field")]=$(this).val();
+										}else {
+											obj[$(this).attr("data-field")]='"'+$(this).val()+'"';
+										}
+                                    });
+									var sql= [];
+									for(var i in obj){
+										sql.push(i+"="+obj[i]);
+									}
+									os.info("UPDATE tree SET "+sql+" WHERE id = "+obj["id"]);
+									sql_noback("UPDATE tree SET "+sql+" WHERE id = "+obj["id"]);
+									$dlg.dialog('close');
+									PC.tree.refresh_tree(); 
+								}
+							},{
+								text:'取消',
+								handler:function(){
+									$dlg.dialog('close');
+								}
+							}]
+						
+						});
+				}
+			}
+        },{
+            text:'删除',
+            handler:function(e){
+	
+				var row=PC.pc_grid.datagrid("getSelected");
+				if (row!=null){
+					var $html=$("<div>是否删除?</div>").css({"padding":"10px 20px"});
+					var $dlg=$('<div></div>').html($html).dialog({
+						title:"信息",
+						buttons: [{
+							text:'确认',
+							handler:function(){
+								sql_noback("DELETE FROM tree WHERE id = " + row.id);
+								sql_noback("DELETE FROM tree WHERE id = '" + row.id + "'");
+								sql_noback("DELETE FROM tree WHERE lujing like '%" + row.id + "%'");
+
+								$dlg.dialog('close');
+								PC.tree.refresh_tree();
+							}
+						},{
+							text:'取消',
+							handler:function(){
+				
+								$dlg.dialog('close');
+							}
+						}]
+					
+					});
+				}
+
+			}
+        }],
+		
+		edatagrid_toolbar : [{
+            text:'新增',
+            handler:function(){
+ 				PC.pc_grid.edatagrid('addRow');
+		 
+			}
+        },{
+            text:'保存',
+            handler:function(){
+				PC.pc_grid.edatagrid('saveRow');
+		
+			}
+        },{
+            text:'取消',
+            handler:function(){
+				PC.pc_grid.edatagrid('cancelRow');
+
+			}
+        },{
+            text:'删除',
+            handler:function(){
+				PC.pc_grid.edatagrid('destroyRow');
+
+			}
+        }],
+		
+		columns: [[{field: 'iconSkin',title: '',width: 20,formatter: function(val, row) {
+						if (val == "folder") {
+							return '<span class="os_ico" style="background-position: -110px 0px;"></span>';
+						} else {
+							return '<span class="os_ico" style="background-position: -110px -32px;"></span>';
+						}
+					}
+				},
+				{field: 'name',title: '名称',width: 150,editor: {type: 'text'},sortable: true},
+				{field: 'type',title: '类型',width: 150,editor: {type: 'text'}},
+				{field: 'id',title: 'id',width: 150,editor: {type: 'text'}},
+				{field: 'pid',title: 'pid',width: 150,editor: {type: 'text'}}
+		]],
+		init_datagrid: function() {
+			PC.pc_grid.datagrid({
+				url: null,
+				onRowContextMenu: function(e, rowIndex, rowData) {//右键事件
+					if(PC.grid.grid_type!="datagrid"){return false;}
+					os.info(PC.grid.grid_type)
+					e.preventDefault(); //禁止默认事件
+					e.stopPropagation();// 禁止冒泡
+					$(this).datagrid('selectRow', rowIndex);//右键时,选中右键的条目
+					//根据 rowdata.type, 显示相应的 右键菜单
+					$("#rightmenu_" + rowData.type).menu('show', {
+						left: e.pageX,
+						top: e.pageY
+					}).attr("rid", rowData.id);//将 id存储在 右键菜单上, 便于其他操作
+				},
+				onDblClickRow: function(rowIndex, rowData) {//双击事件
+				 	os.info(111)
+					if(PC.grid.grid_type!="datagrid"){return false;}
+					if (rowData.type == "folder") {//如果是文件夹 才执行
+						var treenode = PC.pc_tree_obj.getNodeByParam("id", rowData.id, null);
+						$("#" + treenode.tId + "_a").click();
+					}
+				},
+				columns: PC.grid.columns,//标题字段
+				onLoadSuccess: function() {
+					if (PC.grid.grid_type=="datagrid"){
+						$(this).datagrid('enableDnd');//加载成功后触发 gird 的拖动事件
+					}
+					
+				},
+				onBeforeDrag: function(row) {
+					os.info("开始拖动之前,鼠标点下,onBeforeDrag");
+					if (PC.grid.grid_type!="datagrid"){return false;}
+					//row 为行数据信息
+				},
+				onStartDrag: function(row) {
+					os.info("开始拖动,onStartDrag");
+					if (PC.grid.grid_type!="datagrid"){return false;}
+				},
+				onStopDrag: function(row) {
+					os.info("拖动停止,鼠标松开,onStopDrag");
+				},
+				onDragEnter: function(目标行, 拖动行) {
+					if(PC.grid.grid_type!="datagrid"){return false;}
+					os.info("拖上去的瞬间,一次触发,onDragEnter");
+					if (目标行.type == "file") {
+						return false;
+					}
+					/*targetRow:目标行。sourceRow:拖动行。*/
+				},
+				onDragOver: function(targetRow, sourceRow) {
+					os.info("拖动到上面,移动,多次触发,onDragOver");
+				},
+				onDragLeave: function(targetRow, sourceRow) {
+					os.info("从目标行上离开,一次触发,onDragLeave");
+				},
+				onBeforeDrop: function(目标行, 拖动行, point) {
+					if(PC.grid.grid_type!="datagrid"){return false;}
+					
+					os.info("确认行位置后,准备松开鼠标,onBeforeDrop");
+					if (拖动行.type == "file") {
+						sql_noback("UPDATE tree SET pid = '" + 目标行.id + "' WHERE id = " + 拖动行.id);
+						sql_noback("UPDATE tree SET lujing = '" + 目标行.lujing + "|" + 拖动行.id + "' WHERE id = " + 拖动行.id);
+
+					} else if (拖动行.type == "folder") {
+						sql_noback("UPDATE tree SET pid = '" + 目标行.id + "' WHERE id = " + 拖动行.id);
+						sql_noback("UPDATE tree SET lujing = REPLACE( lujing, '" + 拖动行.lujing + "', '" + 目标行.lujing + "|" + 拖动行.id + "' ) WHERE lujing like '%" + 拖动行.lujing + "%'");
+
+					}
+
+					PC.tree.refresh_tree();
+				},
+				onDrop: function(目标行, 拖动行, point) {
+					os.info("将拖动行移动到目标行,onDrop");
+
+				}
+
+			});
+		},
+		查询路径: function(treeNode) {
+			var arr_lujing = "";
+			var tnd = treeNode;
+			for (var i = 0; i <= treeNode.level; i++) {
+				arr_lujing = tnd.id + "|" + arr_lujing; 
+				tnd = tnd.getParentNode();
+			}
+			return arr_lujing;
+		}
+
+	},
+	rightmenu: {
+		"文件夹内右键": {
+			"新建文件夹": function() {
+				var folder_id = PC.pc_tree_obj.getSelectedNodes()[0].id;
+				var get_seq = seq["get"]();
+				sql_noback('INSERT INTO tree (id,pid,name,type,iconSkin,lujing) VALUES (' + get_seq + ',"' + folder_id + '", "新建文件夹","folder","folder","' + $("#os_lj").attr("data-lujing") + get_seq + '")');
+				PC.tree.refresh_tree();
+			},
+			"新建文件": function() {
+				var folder_id = PC.pc_tree_obj.getSelectedNodes()[0].id;
+				var get_seq = seq["get"]();
+				sql_noback('INSERT INTO tree (id,pid,name,type,iconSkin,lujing) VALUES (' + get_seq + ',"' + folder_id + '","新建文件","file","file","' + $("#os_lj").attr("data-lujing") + get_seq + '")');
+			}
+		},
+		"folder": {
+			"删除文件夹": function() {
+				sql_noback("DELETE FROM tree WHERE lujing like '%" + $("#rightmenu_folder").attr("rid") + "%'");
+				sql_noback("DELETE FROM tree WHERE id = '" + $("#rightmenu_folder").attr("rid") + "'");
+				sql_noback("DELETE FROM tree WHERE id = " + $("#rightmenu_folder").attr("rid"));
+				PC.tree.refresh_tree();
+			}
+		},
+		"file": {
+			"删除文件": function() {
+				sql_noback("DELETE FROM tree WHERE id = " + $("#rightmenu_file").attr("rid"));
+				sql_noback("DELETE FROM tree WHERE id = '" + $("#rightmenu_file").attr("rid") + "'");
+			}
+		},
+		init: function() {
+			$(".easyui-menu,.menu-shadow").remove();
+			for (var i in this) {
+				if (i != "init") {
+					var $menu = $("<div id='rightmenu_" + i + "' class='easyui-menu'></div>").appendTo("body");
+					for (var ii in this[i]) {
+						var $div=$("<div>" + ii + "</div>").appendTo($menu);
+						$div.click(this[i][ii]);
+						$div.click(function() {
+							$(".easyui-menu ").menu('hide');
+							var treenode = PC.pc_tree_obj.getSelectedNodes()[0];
+							$("#" + treenode.tId + "_a").click();
+						});
+					}
+				}
+			}
+			$.parser.parse();
+		}
+	}
+
+}
+
+
+$(document).on("contextmenu", ".os_rightmenu",function(e) {
+	$(".os_file_hover").removeClass("os_file_hover");
+	$(this).addClass("os_file_hover");
+	e.stopPropagation();
+	e.preventDefault();
+	var selector = "#rightmenu_" + $(this).attr("data-rightmenu");
+	$(selector).menu('show', {
+		left: e.pageX,
+		top: e.pageY
+	});
+});
+
+
+function open_edatagrid(){
+	 
+	grid_type("edatagrid");
+	
+	PC.pc_grid.edatagrid({
+		toolbar:PC.grid.edatagrid_toolbar,
+		onAdd: function(index, row){
+			os.info("onAdd")
+		},
+		onEdit: function(index, row){
+			os.info("onEdit")
+		},
+		onBeforeSave: function(index){
+			os.info("onBeforeSave")
+		},
+		onSave: function(index, row){
+			os.info("onSave")
+		},
+		onDestroy: function(index, row){
+			os.info("onDestroy")
+		},
+		onError: function(index, row){
+			os.info("onError")
+		}
+	});
+ 
+	
+}
+
+function grid_type(type){
+	PC.grid.grid_type=type;
+	PC.pc_grid.datagrid({grid_type: function(){return type;}});
+	PC.pc_grid.edatagrid({grid_type: function(){return type;}});	
+}
+function open_datagrid(){
+ 
+	grid_type("datagrid");
+	PC.grid.init_datagrid();
+	PC.pc_grid.datagrid({toolbar:PC.grid.toolbar});
+}
+
+
+$(function() {
+	
+ 
+	
+	usejs(os.cssjs["ztree"],function(){
+		usejs(os.cssjs["datagrid_view"],function(){
+			PC.init_PC();
+			PC.tree.init_tree();
+			PC.grid.init_datagrid();
+			PC.rightmenu.init();
+			open_datagrid();
+		});
+	});
+	
+	
+	
+});
+</SCRIPT>
+<div class="easyui-layout" data-options="fit:true">
+  <div data-options="region:'north',border:false" style="height:40px;line-height:40px;">
+    
+    <span id="os_lj"> </span> 
+  </div>
+  <div data-options="region:'west'" style="width:150px">
+    <ul id="treeDemo" class="ztree">
+    </ul>
+  </div>
+  <div data-options="region:'center'" id="os_center" class="os_rightmenu">
+    <table id="os_grid" fit="true">
+    </table>
+  </div>
+  <div data-options="region:'south',border:false" style="height:40px;line-height:40px;">
+  	<button onclick="javascript:PC.tree.init_tree()"> 获取数据 </button>
+    <button onclick="javascript:open_edatagrid();"> 开启editbar </button>
+    <button onclick="javascript:open_datagrid();"> 开启girdbar </button>
+ 
+  </div>
+</div>

@@ -1,0 +1,29 @@
+﻿<!--<script type="text/javascript" src="jquery_zclip.js"></script>-->
+<!--js 文件 已经移动到index.html 界面-->
+<style>
+#copytext {
+	width: 99%;
+	margin:0;
+	height: 300px;
+	font-size:24px;
+}
+</style>
+<textarea id="copytext">请输入内容</textarea>
+<button id="copy" >复制内容</button>
+
+<script type="text/javascript">
+
+    usejs({js:["apps/zclip/jquery_zclip.js"]}, function() {
+        $('#copy').zclip({
+			path: 'ZeroClipboard.swf',
+			copy: function(){
+				return $('#copytext').val();
+			},
+			afterCopy: function(){
+				alert ("成功复制内容："+$('#copytext').val());
+			}
+		});
+    });
+
+
+</script> 
